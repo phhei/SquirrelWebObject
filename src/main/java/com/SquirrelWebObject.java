@@ -1,12 +1,18 @@
 package com;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class SquirrelWebObject {
-    public enum State { NEW, WRITE, READ, OBSOLETE }
+public class SquirrelWebObject implements Serializable {
+    public enum State implements Serializable { NEW, WRITE, READ, OBSOLETE }
 
     ///////////////////
     //DATA/////////////
@@ -20,10 +26,10 @@ public class SquirrelWebObject {
     private State currentState = State.NEW;
 
     //Data (Footer)
-    private List<String> pendingURIs;
-    private Map<String, List<String>> IPMapPendingURis;
-    private List<String> nextCrawledURIs;
-    private List<String> crawledURIs;
+    private String pendingURIs;
+    //private transient Map<String, List<String>> IPMapPendingURis;
+    private String nextCrawledURIs;
+    private String crawledURIs;
     private int countOfWorker;
     private int countofDeadWorker;
     private long RuntimeInSeconds;
@@ -36,6 +42,44 @@ public class SquirrelWebObject {
     public SquirrelWebObject() {
         ID = SquirrelWebObject.IDCOUNTER;
         SquirrelWebObject.IDCOUNTER++;
+    }
+
+    private String ListToString(List<String> list) {
+        final StringBuilder ret = new StringBuilder("<b>");
+        if (list != null)
+            list.forEach(e -> ret.append("<e>" + e + "</e>"));
+        ret.append("</b>");
+        return ret.toString();
+    }
+
+    private List<String> StringToList(String string) {
+        if (string == null)
+            return new ArrayList<>();
+
+        List<String> ret = new ArrayList<>();
+        if (!string.startsWith("<b>") || !string.endsWith("</b>")) {
+            ret.add("PARSING ERROR: String not valid! Pattern is not <b>{content]</b>!");
+            ret.add(string);
+            return ret;
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        boolean read = false;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '>' && i > 3) {
+                if (string.startsWith("</e", i-3)) {
+                    ret.add(buffer.substring(0, buffer.length()-3));
+                    read = false;
+                } else if (string.startsWith("<e", i-2)) {
+                    read = true;
+                }
+            }
+            if (read) {
+                buffer.append(string.charAt(i));
+            }
+        }
+
+        return ret;
     }
 
     //Getter
@@ -92,36 +136,40 @@ public class SquirrelWebObject {
     }
 
     public List<String> getPendingURIs() {
-        List<String> error = isReadable(pendingURIs);
+        List<String> ret = StringToList(pendingURIs);
+        List<String> error = isReadable(ret);
         if (error == null) {
-            return pendingURIs;
+            return ret;
         } else {
             return error;
         }
     }
 
     public int getCountOfPendingURIs() {
-        List<String> error = isReadable(pendingURIs);
+        List<String> ret = StringToList(pendingURIs);
+        List<String> error = isReadable(ret);
         if (error == null) {
-            return pendingURIs.size();
+            return ret.size();
         } else {
             return -1;
         }
     }
 
     public List<String> getNextCrawledURIs() {
-        List<String> error = isReadable(nextCrawledURIs);
+        List<String> ret = StringToList(nextCrawledURIs);
+        List<String> error = isReadable(ret);
         if (error == null) {
-            return nextCrawledURIs;
+            return ret;
         } else {
             return error;
         }
     }
 
     public List<String> getCrawledURIs() {
-        List<String> error = isReadable(crawledURIs);
+        List<String> ret = StringToList(crawledURIs);
+        List<String> error = isReadable(ret);
         if (error == null) {
-            return crawledURIs;
+            return ret;
         } else {
             return error;
         }
@@ -170,15 +218,16 @@ public class SquirrelWebObject {
     }
 
     public void setPendingURIs(List<String> pendingURIs) {
-        this.pendingURIs = pendingURIs;
+        this.pendingURIs = ListToString(pendingURIs);
     }
 
     public void setIPMapPendingURis(Map<String, List<String>> IPMapPendingURis) {
-        this.IPMapPendingURis = IPMapPendingURis;
+        throw new NotImplementedException();
+        //this.IPMapPendingURis = ListToString(IPMapPendingURis);
     }
 
     public void setCrawledURIs(List<String> crawledURIs) {
-        this.crawledURIs = crawledURIs;
+        this.crawledURIs = ListToString(crawledURIs);
     }
 
     public void setCountOfWorker(int countOfWorker) {
@@ -190,10 +239,24 @@ public class SquirrelWebObject {
     }
 
     public void setNextCrawledURIs(List<String> nextCrawledURIs) {
-        this.nextCrawledURIs = nextCrawledURIs;
+        this.nextCrawledURIs = ListToString(nextCrawledURIs);
     }
 
     public void setRuntimeInSeconds(long runtimeInSeconds) {
         RuntimeInSeconds = runtimeInSeconds;
+    }
+
+    //for the RABBIT
+
+    public byte[] convertToByteStream() {
+        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
+            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+                o.writeObject(this);
+            }
+            return b.toByteArray();
+        } catch (IOException e) {
+            System.out.println("ERROR during serializing: " + e.getMessage());
+            return new byte[] {};
+        }
     }
 }
