@@ -11,6 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * SquirrelWebObject is a container class for the RabbitMQ to deliver the data from the Frontier to the Web-Service
+ * @author Philipp Heinisch
+ */
 public class SquirrelWebObject implements Serializable {
     public enum State implements Serializable { NEW, WRITE, READ, OBSOLETE }
 
@@ -248,6 +252,10 @@ public class SquirrelWebObject implements Serializable {
 
     //for the RABBIT
 
+    /**
+     * converts the {@link SquirrelWebObject} into a byte stream (is needed for e.g. rabbitMQ)
+     * @return a byte stream
+     */
     public byte[] convertToByteStream() {
         try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
             try(ObjectOutputStream o = new ObjectOutputStream(b)){
