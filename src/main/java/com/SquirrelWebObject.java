@@ -250,6 +250,21 @@ public class SquirrelWebObject implements Serializable {
         RuntimeInSeconds = runtimeInSeconds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof SquirrelWebObject) {
+            SquirrelWebObject compareSquirrel = (SquirrelWebObject) o;
+            if (pendingURIs.equals(compareSquirrel.pendingURIs) &&
+                    nextCrawledURIs.equals(compareSquirrel.nextCrawledURIs) &&
+                    crawledURIs.equals(compareSquirrel.crawledURIs) &&
+                    countOfWorker == compareSquirrel.countOfWorker &&
+                    countofDeadWorker == compareSquirrel.countofDeadWorker)
+                return true;
+        }
+
+        return false;
+    }
+
     //for the RABBIT
 
     /**
