@@ -30,4 +30,30 @@ public class SquirrelWebObjectTest {
 
         assertEquals(o.getCountOfPendingURIs(), cal.getCountOfPendingURIs());
     }
+
+    @Test
+    public void equals() {
+        SquirrelWebObject o1 = new SquirrelWebObject();
+        SquirrelWebObject o2 = new SquirrelWebObject();
+
+        assertTrue("2 new SquirrelWebObjects should be equal...", o1.equals(o2));
+
+        List<String> pendingURIS = new ArrayList<>(1);
+        pendingURIS.add("https://www.philippheinisch.de");
+        try {
+            o2.setPendingURIs(pendingURIS);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse("One of them got pending URIs --> not equal any more", o1.equals(o2));
+
+        try {
+            o1.setPendingURIs(pendingURIS);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue("Now the other SquirrelWebObjects got the same list --> equal again!", o1.equals(o2));
+    }
 }

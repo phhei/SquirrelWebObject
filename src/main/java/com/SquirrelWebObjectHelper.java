@@ -28,7 +28,9 @@ public abstract class SquirrelWebObjectHelper {
         } catch (IOException e) {
             e.printStackTrace();
             SquirrelWebObject ret = new SquirrelWebObject();
-            ret.setPendingURIs(new ArrayList<String>(Collections.singleton("ERROR while deserialazing: " + e.getMessage() + ". The currupted Bytestream is: " + bytes)));
+            try {
+                ret.setPendingURIs(new ArrayList<>(Collections.singleton("ERROR while deserialize process: " + e.getMessage() + ". The currupted Bytestream is: " + bytes)));
+            } catch (IllegalAccessException e1) { }
             return ret;
         }
     }

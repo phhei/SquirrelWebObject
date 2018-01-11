@@ -215,48 +215,59 @@ public class SquirrelWebObject implements Serializable {
 
     private void isWritable() throws IllegalAccessException {
         if (currentState == State.READ) {
-            throw new IllegalAccessException("The object was already readed! Please use a fresh new SquirrelWebObject!");
+            throw new IllegalAccessException("The object was already read! Please use a fresh new SquirrelWebObject!");
         }
         currentState = State.WRITE;
         writeTempStamp = new Date();
     }
 
-    public void setPendingURIs(List<String> pendingURIs) {
+    public void setPendingURIs(List<String> pendingURIs) throws IllegalAccessException {
+        isWritable();
         this.pendingURIs = ListToString(pendingURIs);
     }
 
-    public void setIPMapPendingURis(Map<String, List<String>> IPMapPendingURis) {
+    public void setIPMapPendingURis(Map<String, List<String>> IPMapPendingURis) throws IllegalAccessException {
+        isWritable();
         throw new NotImplementedException();
         //this.IPMapPendingURis = ListToString(IPMapPendingURis);
     }
 
-    public void setCrawledURIs(List<String> crawledURIs) {
+    public void setCrawledURIs(List<String> crawledURIs) throws IllegalAccessException {
+        isWritable();
         this.crawledURIs = ListToString(crawledURIs);
     }
 
-    public void setCountOfWorker(int countOfWorker) {
+    public void setCountOfWorker(int countOfWorker) throws IllegalAccessException {
+        isWritable();
         this.countOfWorker = countOfWorker;
     }
 
-    public void setCountofDeadWorker(int countofDeadWorker) {
+    public void setCountofDeadWorker(int countofDeadWorker) throws IllegalAccessException {
+        isWritable();
         this.countofDeadWorker = countofDeadWorker;
     }
 
-    public void setNextCrawledURIs(List<String> nextCrawledURIs) {
+    public void setNextCrawledURIs(List<String> nextCrawledURIs) throws IllegalAccessException {
+        isWritable();
         this.nextCrawledURIs = ListToString(nextCrawledURIs);
     }
 
-    public void setRuntimeInSeconds(long runtimeInSeconds) {
+    public void setRuntimeInSeconds(long runtimeInSeconds) throws IllegalAccessException {
+        isWritable();
         RuntimeInSeconds = runtimeInSeconds;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SquirrelWebObject) {
+        if (o != null && o instanceof SquirrelWebObject) {
             SquirrelWebObject compareSquirrel = (SquirrelWebObject) o;
-            if (pendingURIs.equals(compareSquirrel.pendingURIs) &&
-                    nextCrawledURIs.equals(compareSquirrel.nextCrawledURIs) &&
-                    crawledURIs.equals(compareSquirrel.crawledURIs) &&
+            if ((pendingURIs == null && compareSquirrel.pendingURIs != null) ||
+                    (nextCrawledURIs == null && compareSquirrel.nextCrawledURIs != null) ||
+                    (crawledURIs == null && compareSquirrel.crawledURIs != null))
+                return false;
+            if (((pendingURIs == null && compareSquirrel.pendingURIs == null) || (pendingURIs.equals(compareSquirrel.pendingURIs))) &&
+                    ((nextCrawledURIs == null && compareSquirrel.nextCrawledURIs == null) || (nextCrawledURIs.equals(compareSquirrel.nextCrawledURIs))) &&
+                    ((crawledURIs == null && compareSquirrel.crawledURIs == null) || (crawledURIs.equals(compareSquirrel.crawledURIs))) &&
                     countOfWorker == compareSquirrel.countOfWorker &&
                     countofDeadWorker == compareSquirrel.countofDeadWorker)
                 return true;
