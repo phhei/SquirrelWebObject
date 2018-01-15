@@ -25,8 +25,8 @@ public class SquirrelWebObject implements Serializable {
     //METADATA
     private int ID;
     private static int IDCOUNTER = 0;
-    private Date writeTempStamp = null;
-    private Date readTempStamp = null;
+    private Date writeDatetime = null;
+    private Date readDatetime = null;
     private State currentState = State.NEW;
 
     //Data (Footer)
@@ -89,13 +89,13 @@ public class SquirrelWebObject implements Serializable {
     //Getter
 
     private void checkObsolete() {
-        if (writeTempStamp == null)
+        if (writeDatetime == null)
             return;
 
         Date refer = new Date();
         //1h old = obsolete!
         refer.setTime(refer.getTime()-3600000);
-        if (writeTempStamp.before(refer)) {
+        if (writeDatetime.before(refer)) {
             currentState = State.OBSOLETE;
         }
     }
@@ -113,7 +113,7 @@ public class SquirrelWebObject implements Serializable {
 
         if (ret.isEmpty()) {
             currentState = State.READ;
-            readTempStamp = new Date();
+            readDatetime = new Date();
             return null;
         } else {
             return ret;
@@ -135,7 +135,7 @@ public class SquirrelWebObject implements Serializable {
         }
 
         currentState = State.READ;
-        readTempStamp = new Date();
+        readDatetime = new Date();
         return object;
     }
 
@@ -192,18 +192,18 @@ public class SquirrelWebObject implements Serializable {
     }
 
     public String getWriteTime() {
-        if (writeTempStamp == null) {
+        if (writeDatetime == null) {
             return "Until the execution of this method, the object was never wrote!";
         }
-        return writeTempStamp.toString();
+        return writeDatetime.toString();
     }
 
     public String getReadTime() {
-        if (readTempStamp == null) {
+        if (readDatetime == null) {
             return "Until the execution of this method, the object was never read!";
         }
 
-        return readTempStamp.toString() + ((currentState == State.OBSOLETE) ? " | WARNING: The object is obsolete!" : " | The object is ready to read!");
+        return readDatetime.toString() + ((currentState == State.OBSOLETE) ? " | WARNING: The object is obsolete!" : " | The object is ready to read!");
     }
 
     @Override
@@ -218,7 +218,7 @@ public class SquirrelWebObject implements Serializable {
             throw new IllegalAccessException("The object was already read! Please use a fresh new SquirrelWebObject!");
         }
         currentState = State.WRITE;
-        writeTempStamp = new Date();
+        writeDatetime = new Date();
     }
 
     public void setPendingURIs(List<String> pendingURIs) throws IllegalAccessException {
