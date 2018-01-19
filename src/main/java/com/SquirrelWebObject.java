@@ -262,7 +262,7 @@ public class SquirrelWebObject implements Serializable {
         if (o != null && o instanceof SquirrelWebObject) {
             SquirrelWebObject compareSquirrel = (SquirrelWebObject) o;
             if (Math.abs(compareSquirrel.RuntimeInSeconds-RuntimeInSeconds) >= 10) {
-                return true;
+                return false;
             }
             if ((pendingURIs == null && compareSquirrel.pendingURIs != null) ||
                     (nextCrawledURIs == null && compareSquirrel.nextCrawledURIs != null) ||
