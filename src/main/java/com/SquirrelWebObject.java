@@ -2,14 +2,8 @@ package com;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 /**
  * SquirrelWebObject is a container class for the RabbitMQ to deliver the data from the Frontier to the Web-Service
@@ -31,11 +25,12 @@ public class SquirrelWebObject implements Serializable {
 
     //Data (Footer)
     private String pendingURIs;
-    //private transient Map<String, List<String>> IPMapPendingURis;
+    private String IPMapPendingURis;
     private String nextCrawledURIs;
-    private String crawledURIs;
+    //private String crawledURIs;
+    private int countOfCrawledURIs;
     private int countOfWorker;
-    private int countofDeadWorker;
+    private int countOfDeadWorker;
     private long RuntimeInSeconds;
 
     ///////////////////
@@ -56,9 +51,19 @@ public class SquirrelWebObject implements Serializable {
         return ret.toString();
     }
 
+    private String MapToString(Map<String, List<String>> map) {
+        StringBuilder ret = new StringBuilder("<m>");
+        if (map != null) {
+            map.forEach((k, v) -> ret.append("<c><h>" + k + "</h>" + ListToString(v) + "</c>"));
+        }
+        ret.append("</m>");
+
+        return ret.toString();
+    }
+
     private List<String> StringToList(String string) {
         if (string == null)
-            return new ArrayList<>();
+            return Collections.EMPTY_LIST;
 
         List<String> ret = new ArrayList<>();
         if (!string.startsWith("<b>") || !string.endsWith("</b>")) {
@@ -81,6 +86,46 @@ public class SquirrelWebObject implements Serializable {
             if (read) {
                 buffer.append(string.charAt(i));
             }
+        }
+
+        return ret;
+    }
+
+    private Map<String, List<String>> StringToMap(String string) {
+        if (string == null)
+            return Collections.EMPTY_MAP;
+
+        Map<String, List<String>> ret = new HashMap<>();
+        if (!string.startsWith("<m>") || !string.endsWith("</m>")) {
+            List<String> retContent = new ArrayList<>(2);
+            retContent.add("PARSING ERROR: String not valid! Pattern is not <b>{content]</b>!");
+            retContent.add(string);
+            ret.put("ERROR", retContent);
+            return ret;
+        }
+
+        StringBuilder bufferKey = new StringBuilder(), bufferValue = new StringBuilder();
+        boolean readKey = false;
+        boolean readValue = false;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '>' && i > 3) {
+                if (string.startsWith("</c", i-3)) {
+                    ret.put(bufferKey.substring(0, bufferKey.length()-3), StringToList(bufferValue.substring(0, bufferValue.length()-3)));
+                    readKey = false;
+                    readValue = false;
+                }
+                else if (string.startsWith("</h", i-3)) {
+                    readKey = false;
+                    readValue = true;
+                }
+                else if (string.startsWith("<h", i-2)) {
+                    readKey = true;
+                }
+            }
+            if (readKey)
+                bufferKey.append(string.charAt(i));
+            if (readValue)
+                bufferValue.append(string.charAt(i));
         }
 
         return ret;
@@ -116,6 +161,28 @@ public class SquirrelWebObject implements Serializable {
             readDatetime = new Date();
             return null;
         } else {
+            return ret;
+        }
+    }
+
+    private Map<String, List<String>> isReadable (Map<String, List<String>> object) {
+        checkObsolete();
+
+        Map<String, List<String>> ret = new HashMap<>();
+        List<String> arrayList = new ArrayList<>();
+        if (currentState == State.NEW || currentState == State.OBSOLETE)  {
+            arrayList.add("I'm sorry, but I can not read - this object " + ID + " is " + currentState.toString() + " and not written.");
+        }
+        if (object == null) {
+            arrayList.add("The object, that you want to read is not set until yet!");
+        }
+
+        if (arrayList.isEmpty()) {
+            currentState = State.READ;
+            readDatetime = new Date();
+            return null;
+        } else {
+            ret.put("ERROR", arrayList);
             return ret;
         }
     }
@@ -169,9 +236,20 @@ public class SquirrelWebObject implements Serializable {
         }
     }
 
-    public List<String> getCrawledURIs() {
-        List<String> ret = StringToList(crawledURIs);
-        List<String> error = isReadable(ret);
+//    public List<String> getCrawledURIs() {
+//        List<String> ret = StringToList(crawledURIs);
+//        List<String> error = isReadable(ret);
+//        if (error == null) {
+//            return ret;
+//        } else {
+//            return error;
+//        }
+//    }
+
+    public Map<String, List<String>> getIpStringListMap() {
+        Map<String, List<String>> ret = StringToMap(IPMapPendingURis);
+        Map<String, List<String>> error = isReadable(ret);
+
         if (error == null) {
             return ret;
         } else {
@@ -184,11 +262,15 @@ public class SquirrelWebObject implements Serializable {
     }
 
     public int getCountOfDeadWorker() {
-        return isReadable(countofDeadWorker);
+        return isReadable(countOfDeadWorker);
     }
 
     public long getRuntimeInSeconds() {
         return isReadable(RuntimeInSeconds);
+    }
+
+    public int getCountOfCrawledURIs() {
+        return isReadable(countOfCrawledURIs);
     }
 
     public String getWriteTime() {
@@ -228,23 +310,27 @@ public class SquirrelWebObject implements Serializable {
 
     public void setIPMapPendingURis(Map<String, List<String>> IPMapPendingURis) throws IllegalAccessException {
         isWritable();
-        throw new NotImplementedException();
-        //this.IPMapPendingURis = ListToString(IPMapPendingURis);
+        this.IPMapPendingURis = MapToString(IPMapPendingURis);
     }
 
-    public void setCrawledURIs(List<String> crawledURIs) throws IllegalAccessException {
-        isWritable();
-        this.crawledURIs = ListToString(crawledURIs);
-    }
+//    public void setCrawledURIs(List<String> crawledURIs) throws IllegalAccessException {
+//        isWritable();
+//        this.crawledURIs = ListToString(crawledURIs);
+//    }
 
     public void setCountOfWorker(int countOfWorker) throws IllegalAccessException {
         isWritable();
         this.countOfWorker = countOfWorker;
     }
 
-    public void setCountofDeadWorker(int countofDeadWorker) throws IllegalAccessException {
+    public void setCountOfDeadWorker(int countOfDeadWorker) throws IllegalAccessException {
         isWritable();
-        this.countofDeadWorker = countofDeadWorker;
+        this.countOfDeadWorker = countOfDeadWorker;
+    }
+
+    public void setCountOfCrawledURIs(int countOfCrawledURIs) throws IllegalAccessException {
+        isWritable();
+        this.countOfCrawledURIs = countOfCrawledURIs;
     }
 
     public void setNextCrawledURIs(List<String> nextCrawledURIs) throws IllegalAccessException {
@@ -266,13 +352,14 @@ public class SquirrelWebObject implements Serializable {
             }
             if ((pendingURIs == null && compareSquirrel.pendingURIs != null) ||
                     (nextCrawledURIs == null && compareSquirrel.nextCrawledURIs != null) ||
-                    (crawledURIs == null && compareSquirrel.crawledURIs != null))
+                    (IPMapPendingURis == null && compareSquirrel.IPMapPendingURis != null))
                 return false;
             if (((pendingURIs == null && compareSquirrel.pendingURIs == null) || (pendingURIs.equals(compareSquirrel.pendingURIs))) &&
                     ((nextCrawledURIs == null && compareSquirrel.nextCrawledURIs == null) || (nextCrawledURIs.equals(compareSquirrel.nextCrawledURIs))) &&
-                    ((crawledURIs == null && compareSquirrel.crawledURIs == null) || (crawledURIs.equals(compareSquirrel.crawledURIs))) &&
+                    ((IPMapPendingURis == null && compareSquirrel.IPMapPendingURis == null) || (IPMapPendingURis.equals(compareSquirrel.IPMapPendingURis))) &&
                     countOfWorker == compareSquirrel.countOfWorker &&
-                    countofDeadWorker == compareSquirrel.countofDeadWorker)
+                    countOfDeadWorker == compareSquirrel.countOfDeadWorker &&
+                    countOfCrawledURIs == compareSquirrel.countOfCrawledURIs)
                 return true;
         }
 

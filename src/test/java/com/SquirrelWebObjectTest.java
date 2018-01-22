@@ -4,7 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -20,6 +22,12 @@ public class SquirrelWebObjectTest {
         pendingURIlist.add("https://philippheinisch.de");
         pendingURIlist.add("<http://dbPedia.org/ontology/>");
         o.setPendingURIs(pendingURIlist);
+
+        Map<String, List<String>> IPMapList = new HashMap<>(2);
+        IPMapList.put("1. Set", pendingURIlist);
+        IPMapList.put("2. Set", pendingURIlist);
+
+        o.setIPMapPendingURis(IPMapList);
     }
 
     @Test
@@ -29,6 +37,7 @@ public class SquirrelWebObjectTest {
         SquirrelWebObject cal = SquirrelWebObjectHelper.convertToObject(stream);
 
         assertEquals(o.getCountOfPendingURIs(), cal.getCountOfPendingURIs());
+        assertEquals(o.getIpStringListMap().hashCode(), cal.getIpStringListMap().hashCode());
     }
 
     @Test
