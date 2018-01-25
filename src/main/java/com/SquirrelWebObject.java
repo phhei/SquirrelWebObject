@@ -77,7 +77,8 @@ public class SquirrelWebObject implements Serializable {
         for (int i = 0; i < string.length(); i++) {
             if (string.charAt(i) == '>' && i > 3) {
                 if (string.startsWith("</e", i-3)) {
-                    ret.add(buffer.substring(0, buffer.length()-3));
+                    ret.add(buffer.substring(1, buffer.length()-3));
+                    buffer = new StringBuilder();
                     read = false;
                 } else if (string.startsWith("<e", i-2)) {
                     read = true;
@@ -110,7 +111,9 @@ public class SquirrelWebObject implements Serializable {
         for (int i = 0; i < string.length(); i++) {
             if (string.charAt(i) == '>' && i > 3) {
                 if (string.startsWith("</c", i-3)) {
-                    ret.put(bufferKey.substring(0, bufferKey.length()-3), StringToList(bufferValue.substring(0, bufferValue.length()-3)));
+                    ret.put(bufferKey.substring(1, bufferKey.length()-3), StringToList(bufferValue.substring(1, bufferValue.length()-3)));
+                    bufferKey = new StringBuilder();
+                    bufferValue = new StringBuilder();
                     readKey = false;
                     readValue = false;
                 }
@@ -124,7 +127,7 @@ public class SquirrelWebObject implements Serializable {
             }
             if (readKey)
                 bufferKey.append(string.charAt(i));
-            if (readValue)
+            else if (readValue)
                 bufferValue.append(string.charAt(i));
         }
 

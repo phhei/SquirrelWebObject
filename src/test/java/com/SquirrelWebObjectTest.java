@@ -13,17 +13,19 @@ import static org.junit.Assert.*;
 public class SquirrelWebObjectTest {
 
     SquirrelWebObject o;
+    List<String> pendingURIlist;
+    Map<String, List<String>> IPMapList;
 
     @Before
     public void setUp() throws Exception {
         o = new SquirrelWebObject();
-        List<String> pendingURIlist = new ArrayList<>(3);
+        pendingURIlist = new ArrayList<>(3);
         pendingURIlist.add("1. URI");
         pendingURIlist.add("https://philippheinisch.de");
         pendingURIlist.add("<http://dbPedia.org/ontology/>");
         o.setPendingURIs(pendingURIlist);
 
-        Map<String, List<String>> IPMapList = new HashMap<>(2);
+        IPMapList = new HashMap<>(2);
         IPMapList.put("1. Set", pendingURIlist);
         IPMapList.put("2. Set", pendingURIlist);
 
@@ -38,6 +40,8 @@ public class SquirrelWebObjectTest {
 
         assertEquals(o.getCountOfPendingURIs(), cal.getCountOfPendingURIs());
         assertEquals(o.getIpStringListMap().hashCode(), cal.getIpStringListMap().hashCode());
+        assertEquals(o.getPendingURIs().get(0).hashCode(), cal.getPendingURIs().get(0).hashCode());
+        assertEquals(o.getIpStringListMap().entrySet().stream().filter(w -> w.getKey().equals("2. Set")).findFirst().get().getValue().get(2).hashCode(), cal.getIpStringListMap().entrySet().stream().filter(w -> w.getKey().equals("2. Set")).findFirst().get().getValue().get(2).hashCode());
     }
 
     @Test
