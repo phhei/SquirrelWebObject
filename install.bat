@@ -15,4 +15,6 @@ for /F "tokens=2 delims=-" %%i IN ("%filename%") DO set version=%%i
 
 echo Current Version is %version%. Install it!
 
+cd ..
+
 mvn install:install-file -DgroupId=SquirrelWebObject -DartifactId=SquirrelWebObjectJar -Dpackaging=jar -Dversion=%version% -Dfile=%file% -DgeneratePom=true
