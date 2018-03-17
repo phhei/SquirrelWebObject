@@ -15,7 +15,7 @@ public abstract class SquirrelWebObjectHelper {
     /**
      * converts a byte stream into a {@link SquirrelWebObject}. If there are any exceptions, the methods tries to handle them
      * @param bytes the byte stream
-     * @return a SquirrelWebObject, that was in further times converted into a byte stream
+     * @return a {@link SquirrelWebObject}, that was in further times converted into a byte stream
      */
     public static SquirrelWebObject convertToObject(byte[] bytes) {
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
