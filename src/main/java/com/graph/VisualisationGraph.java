@@ -1,14 +1,12 @@
 package com.graph;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 public class VisualisationGraph implements Serializable {
@@ -32,7 +30,7 @@ public class VisualisationGraph implements Serializable {
      * @return the added node. If the node (that URI + IP) was already existing, the return is {@code null}
      */
     public VisualisationNode addNode(String uri, String ip) {
-        if(Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(uri) && n.getIp().equals(ip)).count() == 0) {
+        if(Arrays.stream(nodes).noneMatch(n -> n != null && n.getUri().equals(uri) && n.getIp().equals(ip))) {
             VisualisationNode newNode = new VisualisationNode(uri, ip);
             nodes = extendArray(nodes, newNode);
             return newNode;
@@ -50,8 +48,8 @@ public class VisualisationGraph implements Serializable {
         Optional<VisualisationNode> fromNode = Arrays.stream(nodes).filter(n -> n.getUri().equals(fromURI)).findFirst();
         Optional<VisualisationNode> toNode = Arrays.stream(nodes).filter(n -> n.getUri().equals(toURI)).findFirst();
 
-        VisualisationNode finalFromNode = (fromNode.isPresent()) ? fromNode.get() : addNode(fromURI);
-        VisualisationNode finalToNode = (toNode.isPresent()) ? toNode.get() : addNode(toURI);
+        VisualisationNode finalFromNode = fromNode.orElseGet(() -> addNode(fromURI));
+        VisualisationNode finalToNode = toNode.orElseGet(() -> addNode(toURI));
 
         VisualisationEdge newEdge = new VisualisationEdge(finalFromNode, finalToNode);
         edges = extendArray(edges, newEdge);
@@ -64,7 +62,7 @@ public class VisualisationGraph implements Serializable {
      * @param object the object, that should be added
      * @return the extended array
      */
-    private <T> T[] extendArray(@NotNull T[] array, T object) {
+    private <T> T[] extendArray(T[] array, T object) {
         T[] cloneArray = array.clone();
         for (int i=0; i<cloneArray.length; i++) {
             if (cloneArray[i] == null) {
@@ -92,8 +90,8 @@ public class VisualisationGraph implements Serializable {
      * @param array the array, that should be optimized
      * @return the optimized array
      */
-    private <T> T[] optimizeArray(@NotNull T[] array) {
-        int length = (int) Arrays.stream(array).filter(e -> e != null).count();
+    private <T> T[] optimizeArray(T[] array) {
+        int length = (int) Arrays.stream(array).filter(Objects::nonNull).count();
 
         T[] newArray = Arrays.copyOf(array, length);
 
@@ -139,7 +137,7 @@ public class VisualisationGraph implements Serializable {
      * @return all specified edges
      */
     public VisualisationEdge[] getEdges(VisualisationNode node) {
-        return Arrays.stream(edges).filter(e -> e != null && (e.to == node|| e.from == node)).collect(ArrayList::new, ArrayList::add, ArrayList::addAll).toArray(new VisualisationEdge[0]);
+        return Arrays.stream(edges).filter(e -> e != null && (e.getStart() == node|| e.getEnd() == node)).collect(ArrayList::new, ArrayList::add, ArrayList::addAll).toArray(new VisualisationEdge[0]);
     }
 
     /**

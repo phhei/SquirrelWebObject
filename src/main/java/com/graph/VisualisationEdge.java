@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class VisualisationEdge implements Serializable {
 
-    VisualisationNode from, to;
-    int weight;
+    private VisualisationNode from, to;
+    private int weight;
 
     public VisualisationEdge(VisualisationNode from, VisualisationNode to) {
         this.from = from;

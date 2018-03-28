@@ -17,4 +17,4 @@ echo Current Version is %version%. Install it!
 
 cd ..
 
-mvn install:install-file -DgroupId=SquirrelWebObject -DartifactId=SquirrelWebObjectJar -Dpackaging=jar -Dversion=%version% -Dfile=%file% -DgeneratePom=true
+mvn install:install-file -DgroupId=org.aksw.simba.squirrel -DartifactId=SquirrelWebObject -Dpackaging=jar -Dversion=%version% -Dfile=%file% -DgeneratePom=true
