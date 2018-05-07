@@ -30,6 +30,10 @@ public class VisualisationGraph implements Serializable {
      * @return the added node. If the node (that URI + IP) was already existing, the return is {@code null}
      */
     public VisualisationNode addNode(String uri, String ip) {
+        if (uri == null || ip == null) {
+            throw new IllegalArgumentException("uri and ip must not be null! (" + uri + "/" +ip + ")");
+        }
+
         if(Arrays.stream(nodes).noneMatch(n -> n != null && n.getUri().equals(uri) && n.getIp().equals(ip))) {
             VisualisationNode newNode = new VisualisationNode(uri, ip);
             nodes = extendArray(nodes, newNode);
@@ -45,8 +49,12 @@ public class VisualisationGraph implements Serializable {
      * @return the added edge. It's possible to have multiple edges between 2 nodes
      */
     public VisualisationEdge addEdge(String fromURI, String toURI) {
-        Optional<VisualisationNode> fromNode = Arrays.stream(nodes).filter(n -> n.getUri().equals(fromURI)).findFirst();
-        Optional<VisualisationNode> toNode = Arrays.stream(nodes).filter(n -> n.getUri().equals(toURI)).findFirst();
+        if (fromURI == null || toURI == null) {
+            throw new IllegalArgumentException("fromURI and toURI must not be null! (" + fromURI + "->" + toURI + ")");
+        }
+
+        Optional<VisualisationNode> fromNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(fromURI)).findFirst();
+        Optional<VisualisationNode> toNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(toURI)).findFirst();
 
         VisualisationNode finalFromNode = fromNode.orElseGet(() -> addNode(fromURI));
         VisualisationNode finalToNode = toNode.orElseGet(() -> addNode(toURI));
@@ -146,6 +154,6 @@ public class VisualisationGraph implements Serializable {
      * @return the node or {@code null}, if the node is not exiting
      */
     public VisualisationNode getNode(String uri) {
-        return Arrays.stream(nodes).filter(n -> n.getUri().equals(uri)).findFirst().get();
+        return Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(uri)).findFirst().get();
     }
 }

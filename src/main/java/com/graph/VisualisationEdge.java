@@ -8,6 +8,10 @@ public class VisualisationEdge implements Serializable {
     private int weight;
 
     public VisualisationEdge(VisualisationNode from, VisualisationNode to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("from and to param must not be null! (" + from + " -> " + to + ")");
+        }
+
         this.from = from;
         this.to = to;
         weight = 1;

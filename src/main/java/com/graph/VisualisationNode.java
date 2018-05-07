@@ -10,12 +10,20 @@ public class VisualisationNode implements Serializable {
     private Color color;
 
     public VisualisationNode(String uri) {
+        if (uri == null) {
+            throw new IllegalArgumentException("uri must not be null! (" + uri + ")");
+        }
+
         this.uri = uri;
         ip = "unknown";
         color = Color.LIGHT_GRAY;
     }
 
     public VisualisationNode(String uri, String ip) {
+        if (uri == null || ip == null) {
+            throw new IllegalArgumentException("uri and ip must not be null! (" + uri + "/" + ip + ")");
+        }
+
         this.uri = uri;
         this.ip = ip;
         color = Color.GREEN;
