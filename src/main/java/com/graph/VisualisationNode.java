@@ -33,6 +33,8 @@ public class VisualisationNode implements Serializable {
         this.color = color;
     }
 
+    void setIp(String ip) {this.ip = ip; }
+
     public String getUri() {
         return uri;
     }

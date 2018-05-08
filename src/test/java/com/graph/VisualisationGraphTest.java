@@ -15,8 +15,8 @@ public class VisualisationGraphTest {
     @Before
     public void setUp() throws Exception {
         graph.addNode("Test 1");
-        graph.addNode("Test 2", "1.1.1.1");
         graph.addNode("Test 2");
+        graph.addNode("Test 2", "1.1.1.1");
 
         graph.addEdge("Test 1", "Test 2");
         graph.addEdge("Test 2", "Test 1");
