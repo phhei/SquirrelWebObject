@@ -2,49 +2,74 @@ package com.graph;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.Random;
 
 public class VisualisationNode implements Serializable {
 
+    private String id;
     private String uri;
     private String ip;
+    public int x,y;
+    public final int size = 3;
     private Color color;
 
-    public VisualisationNode(String uri) {
+    private static Random random = new Random();
+
+    public VisualisationNode(int id, String uri) {
         if (uri == null) {
             throw new IllegalArgumentException("uri must not be null! (" + uri + ")");
         }
 
+        this.id = "n" + id;
+        x = id;
+        y = random.nextInt(9);
         this.uri = uri;
         ip = "unknown";
         color = Color.LIGHT_GRAY;
     }
 
-    public VisualisationNode(String uri, String ip) {
+    public VisualisationNode(int id, String uri, String ip) {
         if (uri == null || ip == null) {
             throw new IllegalArgumentException("uri and ip must not be null! (" + uri + "/" + ip + ")");
         }
 
+        this.id = "n" + id;
+        x = id;
+        y = random.nextInt(9);
         this.uri = uri;
         this.ip = ip;
         color = Color.GREEN;
+    }
+
+    public String getId() { return id; }
+
+    void setIp(String ip) {
+        if (ip == null) {
+            throw new IllegalArgumentException("ip must not be null! (tried to reset the ip "+ this.ip + " from the node" + this + " )");
+        }
+
+        this.ip = ip;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getLabel() { return getUri(); }
+
+    public String getIp() {
+        return ip;
     }
 
     public void setColor(Color color) {
         this.color = color;
     }
 
-    void setIp(String ip) {this.ip = ip; }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public Color getColor() {
-        return color;
+    public String getColor() {
+        String red = Integer.toHexString(color.getRed());
+        String green = Integer.toHexString(color.getGreen());
+        String blue = Integer.toHexString(color.getBlue());
+        return "#" + ((red.length() == 1) ? "0" + red : red) + ((green.length() == 1) ? "0" + green : green) + ((blue.length() == 1) ? "0" + blue : blue);
     }
 
     @Override

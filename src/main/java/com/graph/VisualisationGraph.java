@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public class VisualisationGraph implements Serializable {
 
+
+    private int IDcounter = 0;
     private VisualisationNode[] nodes = new VisualisationNode[8];
     private VisualisationEdge[] edges = new VisualisationEdge[8];
 
@@ -31,7 +33,7 @@ public class VisualisationGraph implements Serializable {
      */
     public VisualisationNode addNode(String uri, String ip) {
         if (uri == null || ip == null) {
-            throw new IllegalArgumentException("uri and ip must not be null! (" + uri + "/" +ip + ")");
+            throw new IllegalArgumentException("uri and ip must not be null! (" + uri + "/" + ip + ")");
         }
 
         Optional<VisualisationNode> node = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(uri)).findFirst();
@@ -40,7 +42,8 @@ public class VisualisationGraph implements Serializable {
             return null;
         }
 
-        VisualisationNode newNode = new VisualisationNode(uri, ip);
+        VisualisationNode newNode = new VisualisationNode(IDcounter, uri, ip);
+        IDcounter++;
         nodes = extendArray(nodes, newNode);
         return newNode;
     }
@@ -53,16 +56,17 @@ public class VisualisationGraph implements Serializable {
      */
     public VisualisationEdge addEdge(String fromURI, String toURI) {
         if (fromURI == null || toURI == null) {
-            throw new IllegalArgumentException("fromURI and toURI must not be null! (" + fromURI + "->" + toURI + ")");
+            throw new IllegalArgumentException("source and target must not be null! (" + fromURI + "->" + toURI + ")");
         }
 
         Optional<VisualisationNode> fromNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(fromURI)).findFirst();
         Optional<VisualisationNode> toNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(toURI)).findFirst();
 
-        VisualisationNode finalFromNode = fromNode.orElseGet(() -> addNode(fromURI));
-        VisualisationNode finalToNode = toNode.orElseGet(() -> addNode(toURI));
+        VisualisationNode finalFromNode = fromNode.orElse(addNode(fromURI));
+        VisualisationNode finalToNode = toNode.orElse(addNode(toURI));
 
-        VisualisationEdge newEdge = new VisualisationEdge(finalFromNode, finalToNode);
+        VisualisationEdge newEdge = new VisualisationEdge(IDcounter, finalFromNode, finalToNode);
+        IDcounter++;
         edges = extendArray(edges, newEdge);
         return newEdge;
     }
@@ -148,7 +152,7 @@ public class VisualisationGraph implements Serializable {
      * @return the node or {@code null}, if the node is not exiting
      */
     public VisualisationNode getNode(String uri) {
-        return Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(uri)).findFirst().get();
+        return Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(uri)).findFirst().orElse(null);
     }
 
     /**
@@ -165,6 +169,6 @@ public class VisualisationGraph implements Serializable {
      * @return all specified edges
      */
     public VisualisationEdge[] getEdges(VisualisationNode node) {
-        return Arrays.stream(edges).filter(e -> e != null && (e.getStart() == node|| e.getEnd() == node)).collect(ArrayList::new, ArrayList::add, ArrayList::addAll).toArray(new VisualisationEdge[0]);
+        return Arrays.stream(edges).filter(e -> e != null && (e.getSourceNode() == node|| e.getTargetNode() == node)).collect(ArrayList::new, ArrayList::add, ArrayList::addAll).toArray(new VisualisationEdge[0]);
     }
 }

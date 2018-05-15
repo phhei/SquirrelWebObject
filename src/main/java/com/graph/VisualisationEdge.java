@@ -4,16 +4,18 @@ import java.io.Serializable;
 
 public class VisualisationEdge implements Serializable {
 
-    private VisualisationNode from, to;
+    private String id;
+    private VisualisationNode source, target;
     private int weight;
 
-    public VisualisationEdge(VisualisationNode from, VisualisationNode to) {
-        if (from == null || to == null) {
-            throw new IllegalArgumentException("from and to param must not be null! (" + from + " -> " + to + ")");
+    public VisualisationEdge(int id, VisualisationNode source, VisualisationNode target) {
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("source and target param must not be null! (" + source + " -> " + target + ")");
         }
 
-        this.from = from;
-        this.to = to;
+        this.id = "e" + id;
+        this.source = source;
+        this.target = target;
         weight = 1;
     }
 
@@ -21,16 +23,22 @@ public class VisualisationEdge implements Serializable {
         weight++;
     }
 
-    public VisualisationNode getStart() {
-        return from;
+    public String getId() { return id; }
+
+    public String getSource() { return source.getId(); }
+
+    public VisualisationNode getSourceNode() {
+        return source;
     }
 
-    public VisualisationNode getEnd() {
-        return to;
+    public String getTarget() { return target.getId(); }
+
+    public VisualisationNode getTargetNode() {
+        return target;
     }
 
     @Override
     public String toString() {
-        return from + " -> " + to;
+        return source + " -> " + target;
     }
 }
