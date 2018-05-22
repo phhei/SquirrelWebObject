@@ -1,8 +1,7 @@
 package com.graph;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.Serializable;
-import java.util.Random;
 
 public class VisualisationNode implements Serializable {
 
@@ -13,16 +12,14 @@ public class VisualisationNode implements Serializable {
     public final int size = 3;
     private Color color;
 
-    private static Random random = new Random();
-
     public VisualisationNode(int id, String uri) {
         if (uri == null) {
-            throw new IllegalArgumentException("uri must not be null! (" + uri + ")");
+            throw new IllegalArgumentException("uri must not be null! (ID " + id + ")");
         }
 
         this.id = "n" + id;
         x = id;
-        y = random.nextInt(9);
+        y = id % 5;
         this.uri = uri;
         ip = "unknown";
         color = Color.LIGHT_GRAY;
@@ -35,7 +32,7 @@ public class VisualisationNode implements Serializable {
 
         this.id = "n" + id;
         x = id;
-        y = random.nextInt(9);
+        y = 5 + id % 5;
         this.uri = uri;
         this.ip = ip;
         color = Color.GREEN;

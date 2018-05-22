@@ -62,8 +62,8 @@ public class VisualisationGraph implements Serializable {
         Optional<VisualisationNode> fromNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(fromURI)).findFirst();
         Optional<VisualisationNode> toNode = Arrays.stream(nodes).filter(n -> n != null && n.getUri().equals(toURI)).findFirst();
 
-        VisualisationNode finalFromNode = fromNode.orElse(addNode(fromURI));
-        VisualisationNode finalToNode = toNode.orElse(addNode(toURI));
+        VisualisationNode finalFromNode = fromNode.isPresent() ? fromNode.get() : addNode(fromURI);
+        VisualisationNode finalToNode = toNode.isPresent() ? toNode.get() : addNode(toURI);
 
         VisualisationEdge newEdge = new VisualisationEdge(IDcounter, finalFromNode, finalToNode);
         IDcounter++;

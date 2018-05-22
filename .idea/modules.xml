@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SquirrelWebObjectJar.iml" filepath="$PROJECT_DIR$/SquirrelWebObjectJar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SquirrelWebObject.iml" filepath="$PROJECT_DIR$/SquirrelWebObject.iml" />
     </modules>
   </component>
 </project>
